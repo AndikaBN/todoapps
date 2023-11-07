@@ -12,11 +12,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const uncompletedTODOList = document.getElementById("todos");
     uncompletedTODOList.innerHTML = "";
 
+    const completedTODOList = document.getElementById("completed-todos");
+    completedTODOList.innerHTML = '';
+
     for (const todoItem of todos) {
       const todoElement = makeTodo(todoItem);
-      if (!todoItem.isCompleted) {
+      if (!todoItem.isCompleted)
         uncompletedTODOList.append(todoElement);
-      }
+      else
+        completedTODOList.append(todoElement);
     }
   });
 
@@ -69,14 +73,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const undoButton = document.createElement("button");
       undoButton.classList.add("undo-button");
 
-      undoButton.addEventListener("click", function () {
-        undiTaskFromCompleted(todoObject.id);
+      undoButton.addEventListener('click', function () {
+        undoTaskFromCompleted(todoObject.id);
       });
 
       const trashButton = document.createElement("button");
       trashButton.classList.add("trash-button");
 
-      trashButton.addEventListener("click", function () {
+      trashButton.addEventListener('click', function () {
         removeTaskFromCompleted(todoObject.id);
       });
 
@@ -105,6 +109,29 @@ document.addEventListener("DOMContentLoaded", function () {
       for (const todoItem of todos) {
         if (todoItem.id === todoID) {
           return todoItem;
+        }
+      }
+      return null;
+    }
+
+    function removeTaskFromCompleted(todoId) {
+      const todoTarger = findTodoIndex(todoId);
+      if (todoTarger==null)return;
+      todos.splice(todoTarger,1);
+      document.dispatchEvent(new Event(RENDER_EVENT));
+    }
+
+    function undoTaskFromCompleted(todoId) {
+      const todoTarger = findTodo(todoId);
+      if(todoTarger==null) return;
+      todoTarger.isCompleted = false;
+      document.dispatchEvent(new Event(RENDER_EVENT));
+    }
+
+    function findTodoIndex(todoId) {
+      for (const index in todos) {
+        if (todos[index].id == todoId) {
+          return index;
         }
       }
       return null;
